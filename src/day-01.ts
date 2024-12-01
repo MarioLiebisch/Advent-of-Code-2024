@@ -1,3 +1,6 @@
+const example: string = 'data/example-01.txt';
+const input: string = 'data/input-01.txt';
+
 import fs from 'fs';
 
 type LocationList = number[];
@@ -65,9 +68,9 @@ const solve_2 = (file: string): number => {
     return res;
 };
 
-export function main (args: string[]): void {
-    console.log('Example 1:', solve_1('data/example-01.txt'));
-    console.log('Solution 1:', solve_1('data/input-01.txt'));
-    console.log('Example 2:', solve_2('data/example-01.txt'));
-    console.log('Solution 2:', solve_2('data/input-01.txt'));
+export const main = (args: string[]): void => {
+    console.log('Example 1:', solve_1(example));
+    console.log('Solution 1:', solve_1(input));
+    console.log('Example 2:', solve_2(example));
+    console.log('Solution 2:', solve_2(input));
 };
