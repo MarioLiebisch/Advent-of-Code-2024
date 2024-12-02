@@ -1,5 +1,4 @@
 import process from "node:process";
-import fs from "node:fs/promises";
 
 const main = async () => {
   const argv = process.argv;
@@ -20,14 +19,8 @@ const main = async () => {
     file = `./${file}.js`;
   }
 
-  try {
-    await fs.access(file);
-    const script = await import(file);
-    process.exitCode = script.main(argv.slice(3));
-  } catch {
-    console.error(`File ${file} does not exist!`);
-    return;
-  }
+  const script = await import(file);
+  process.exitCode = script.main(argv.slice(3)) ?? 0;
 };
 
 main();
