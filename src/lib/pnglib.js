@@ -143,7 +143,7 @@
 			// If the current browser supports the Base64 encoding
 			// function, then offload the that to the browser as it
 			// will be done in native code.
-			if ((typeof window.btoa !== 'undefined') && (window.btoa !== null)) {
+			if (typeof window !== 'undefined' && (typeof window.btoa !== 'undefined') && (window.btoa !== null)) {
 				return window.btoa(s);
 			}
 
