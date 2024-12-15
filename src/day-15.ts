@@ -5,198 +5,12 @@ const input: string = "data/input-15.txt";
 
 import fs from "fs";
 
-class Vector {
-  x: number;
-  y: number;
-  constructor(x: number, y: number) {
-    this.x = x;
-    this.y = y;
-  }
-}
-
 enum Direction {
   UP = "^",
   LEFT = "<",
   RIGHT = ">",
   DOWN = "v",
 }
-
-class RobotMap {
-  map: string[] = [];
-  instructions: string = "";
-  width: number;
-  height: number;
-  instruction_index: number = 0;
-  robot_position: Vector = new Vector(0, 0);
-
-  constructor(file: string) {
-    let in_instructions: boolean = false;
-    for (const line of fs.readFileSync(file, "utf-8").split(/\r?\n/)) {
-      if (!in_instructions) {
-        if (line === "") {
-          in_instructions = true;
-          continue;
-        }
-        const ri = line.indexOf("@");
-        if (ri !== -1) {
-          this.robot_position = new Vector(ri, this.map.length);
-          this.map.push(line.replace("@", "."));
-          continue;
-        }
-        this.map.push(line);
-        continue;
-      }
-      this.instructions += line;
-    }
-    this.width = this.map[0].length;
-    this.height = this.map.length;
-  }
-
-  move(d: Direction): boolean {
-    const move_target = this.find_move_endpoint(d);
-    if (!move_target) {
-      return false;
-    }
-    switch (d) {
-      case Direction.UP:
-        for (let y = move_target.y; y < this.robot_position.y; y++) {
-          const tile = this.map[y + 1][this.robot_position.x];
-          this.map[y] =
-            this.map[y].substring(0, this.robot_position.x) +
-            tile +
-            this.map[y].substring(this.robot_position.x + 1);
-        }
-        this.map[this.robot_position.y] =
-          this.map[this.robot_position.y].substring(0, this.robot_position.x) +
-          "." +
-          this.map[this.robot_position.y].substring(this.robot_position.x + 1);
-        this.robot_position.y--;
-        break;
-      case Direction.LEFT:
-        this.map[this.robot_position.y] =
-          this.map[this.robot_position.y].substring(0, move_target.x) +
-          this.map[this.robot_position.y].substring(
-            move_target.x + 1,
-            this.robot_position.x,
-          ) +
-          "." +
-          this.map[this.robot_position.y].substring(this.robot_position.x);
-        this.robot_position.x--;
-        break;
-      case Direction.RIGHT:
-        this.map[this.robot_position.y] =
-          this.map[this.robot_position.y].substring(
-            0,
-            this.robot_position.x + 1,
-          ) +
-          "." +
-          this.map[this.robot_position.y].substring(
-            this.robot_position.x + 1,
-            move_target.x,
-          ) +
-          this.map[this.robot_position.y].substring(move_target.x + 1);
-        this.robot_position.x++;
-        break;
-      case Direction.DOWN:
-        for (let y = move_target.y; y > this.robot_position.y + 1; y--) {
-          const tile = this.map[y - 1][this.robot_position.x];
-          this.map[y] =
-            this.map[y].substring(0, this.robot_position.x) +
-            tile +
-            this.map[y].substring(this.robot_position.x + 1);
-        }
-        this.map[this.robot_position.y + 1] =
-          this.map[this.robot_position.y + 1].substring(
-            0,
-            this.robot_position.x,
-          ) +
-          "." +
-          this.map[this.robot_position.y + 1].substring(
-            this.robot_position.x + 1,
-          );
-        this.robot_position.y++;
-        break;
-    }
-    return true;
-  }
-
-  find_move_endpoint(d: Direction): Vector | null {
-    let x = this.robot_position.x;
-    let y = this.robot_position.y;
-    let dx = 0;
-    let dy = 0;
-    switch (d) {
-      case Direction.UP:
-        dy = -1;
-        break;
-      case Direction.LEFT:
-        dx = -1;
-        break;
-      case Direction.RIGHT:
-        dx = 1;
-        break;
-      case Direction.DOWN:
-        dy = 1;
-        break;
-    }
-    while (true) {
-      x += dx;
-      y += dy;
-      if (x < 0 || x >= this.width || y < 0 || y >= this.height) {
-        return null;
-      }
-      switch (this.map[y][x]) {
-        case ".":
-          return new Vector(x, y);
-        case "#":
-          return null;
-      }
-    }
-  }
-
-  step(): boolean {
-    if (this.instruction_index >= this.instructions.length) {
-      return false;
-    }
-    return this.move(this.instructions[this.instruction_index++] as Direction);
-  }
-
-  get gps(): number {
-    let res = 0;
-    for (let y = 0; y < this.height; y++) {
-      for (let x = 0; x < this.width; x++) {
-        if (this.map[y][x] === "O") {
-          res += y * 100 + x;
-        }
-      }
-    }
-    return res;
-  }
-
-  toString(): string {
-    let str = "";
-    for (let y = 0; y < this.height; y++) {
-      if (y === this.robot_position.y) {
-        str +=
-          this.map[y].substring(0, this.robot_position.x) +
-          "@" +
-          this.map[y].substring(this.robot_position.x + 1) +
-          "\n";
-        continue;
-      }
-      str += this.map[y] + "\n";
-    }
-    return str;
-  }
-}
-
-const solve_1 = (file: string): number => {
-  const map = new RobotMap(file);
-  for (let i = 0; i < map.instructions.length; i++) {
-    map.step();
-  }
-  return map.gps;
-};
 
 const INTERSECT_MARGIN = 0.5;
 class Rect {
@@ -220,7 +34,7 @@ class Rect {
     );
   }
 }
-class RobotMapWide {
+class RobotMap {
   obstacles: Rect[] = [];
   boxes: Rect[] = [];
   robot: Rect;
@@ -229,7 +43,7 @@ class RobotMapWide {
   width: number = 0;
   height: number = 0;
 
-  constructor(file: string) {
+  constructor(file: string, scale_x: number = 1) {
     let in_instructions: boolean = false;
     for (const line of fs.readFileSync(file, "utf-8").split(/\r?\n/)) {
       if (!in_instructions) {
@@ -237,23 +51,23 @@ class RobotMapWide {
           in_instructions = true;
           continue;
         }
-        this.width = line.length * 2;
+        this.width = line.length * scale_x;
         for (let x = 0; x < line.length; x++) {
           switch (line[x]) {
             case "@":
-              this.robot = new Rect(x * 2, this.height);
+              this.robot = new Rect(x * scale_x, this.height);
               break;
             case "#": {
               let end = x + 1;
               for (; end < line.length && line[end] === "#"; end++);
               this.obstacles.push(
-                new Rect(x * 2, this.height, (end - x) * 2, 1),
+                new Rect(x * scale_x, this.height, (end - x) * scale_x, 1),
               );
               x = end - 1;
               break;
             }
             case "O":
-              this.boxes.push(new Rect(x * 2, this.height, 2));
+              this.boxes.push(new Rect(x * scale_x, this.height, scale_x));
               break;
           }
         }
@@ -262,7 +76,6 @@ class RobotMapWide {
       }
       this.instructions += line;
     }
-    console.log();
   }
 
   get_moving_boxes(box: Rect, direction: Direction): Set<Rect> | null {
@@ -389,14 +202,15 @@ class RobotMapWide {
   }
 }
 
+const solve_1 = (file: string): number => {
+  const map = new RobotMap(file);
+  for (; map.step(); );
+  return map.gps;
+};
+
 const solve_2 = (file: string): number => {
-  const map = new RobotMapWide(file);
-  // console.log(map.toString());
-  // console.log();
-  for (; map.step(); ) {
-    // console.log(map.toString());
-    // console.log();
-  }
+  const map = new RobotMap(file, 2);
+  for (; map.step(); );
   return map.gps;
 };
 
