@@ -39,54 +39,52 @@ const solve_1 = (file: string): number => {
     }
   }
 
-  const solve = (start: Vector): Vector[] => {
-    const queue: Vector[][] = [[start]];
-    const visited: Set<string> = new Set();
+  let fair_path: Vector[] = [];
 
-    while (queue.length > 0) {
-      const path = queue.shift()!;
-      const { x, y } = path[path.length - 1];
-      if (x === end.x && y === end.y) {
-        return path;
-      }
+  const queue: Vector[][] = [[start]];
+  const visited: Set<string> = new Set();
 
-      const key = `${x},${y}`;
-      if (visited.has(key)) {
+  while (queue.length > 0) {
+    const path = queue.shift()!;
+    const { x, y } = path[path.length - 1];
+    if (x === end.x && y === end.y) {
+      fair_path = path;
+      break;
+    }
+
+    const key = `${x},${y}`;
+    if (visited.has(key)) {
+      continue;
+    }
+    visited.add(key);
+
+    const directions: Vector[] = [
+      { x: 0, y: -1 },
+      { x: 0, y: 1 },
+      { x: -1, y: 0 },
+      { x: 1, y: 0 },
+    ];
+
+    for (const { x: dx, y: dy } of directions) {
+      const nx = x + dx;
+      const ny = y + dy;
+      if (nx < 0 || nx >= width || ny < 0 || ny >= height) {
         continue;
       }
-      visited.add(key);
 
-      const directions: Vector[] = [
-        { x: 0, y: -1 },
-        { x: 0, y: 1 },
-        { x: -1, y: 0 },
-        { x: 1, y: 0 },
-      ];
-
-      for (const { x: dx, y: dy } of directions) {
-        const nx = x + dx;
-        const ny = y + dy;
-        if (nx < 0 || nx >= width || ny < 0 || ny >= height) {
-          continue;
-        }
-
-        if (map[ny][nx] === "#") {
-          continue;
-        }
-
-        const np: Vector = { x: nx, y: ny };
-        const npk = `${nx},${ny}`;
-        if (visited.has(npk)) {
-          continue;
-        }
-
-        queue.push([...path, np]);
+      if (map[ny][nx] === "#") {
+        continue;
       }
-    }
-    return [];
-  };
 
-  const fair_path = solve(start);
+      const np: Vector = { x: nx, y: ny };
+      const npk = `${nx},${ny}`;
+      if (visited.has(npk)) {
+        continue;
+      }
+
+      queue.push([...path, np]);
+    }
+  }
 
   // Find all positions to cheat
   const cheatableWalls: Vector[] = [];
@@ -173,54 +171,52 @@ const solve_2 = (file: string): number => {
     }
   }
 
-  const solve = (start: Vector): Vector[] => {
-    const queue: Vector[][] = [[start]];
-    const visited: Set<string> = new Set();
+  const queue: Vector[][] = [[start]];
+  const visited: Set<string> = new Set();
+  let fair_path: Vector[] = [];
 
-    while (queue.length > 0) {
-      const path = queue.shift()!;
-      const { x, y } = path[path.length - 1];
-      if (x === end.x && y === end.y) {
-        return path;
-      }
+  while (queue.length > 0) {
+    const path = queue.shift()!;
+    const { x, y } = path[path.length - 1];
+    if (x === end.x && y === end.y) {
+      fair_path = path;
+      break;
+    }
 
-      const key = `${x},${y}`;
-      if (visited.has(key)) {
+    const key = `${x},${y}`;
+    if (visited.has(key)) {
+      continue;
+    }
+    visited.add(key);
+
+    const directions: Vector[] = [
+      { x: 0, y: -1 },
+      { x: 0, y: 1 },
+      { x: -1, y: 0 },
+      { x: 1, y: 0 },
+    ];
+
+    for (const { x: dx, y: dy } of directions) {
+      const nx = x + dx;
+      const ny = y + dy;
+      if (nx < 0 || nx >= width || ny < 0 || ny >= height) {
         continue;
       }
-      visited.add(key);
 
-      const directions: Vector[] = [
-        { x: 0, y: -1 },
-        { x: 0, y: 1 },
-        { x: -1, y: 0 },
-        { x: 1, y: 0 },
-      ];
-
-      for (const { x: dx, y: dy } of directions) {
-        const nx = x + dx;
-        const ny = y + dy;
-        if (nx < 0 || nx >= width || ny < 0 || ny >= height) {
-          continue;
-        }
-
-        if (map[ny][nx] === "#") {
-          continue;
-        }
-
-        const np: Vector = { x: nx, y: ny };
-        const npk = `${nx},${ny}`;
-        if (visited.has(npk)) {
-          continue;
-        }
-
-        queue.push([...path, np]);
+      if (map[ny][nx] === "#") {
+        continue;
       }
-    }
-    return [];
-  };
 
-  const fair_path = solve(start);
+      const np: Vector = { x: nx, y: ny };
+      const npk = `${nx},${ny}`;
+      if (visited.has(npk)) {
+        continue;
+      }
+
+      queue.push([...path, np]);
+    }
+  }
+
   const fair_path_length = fair_path.length;
 
   let res = 0;
