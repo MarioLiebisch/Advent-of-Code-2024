@@ -1,6 +1,8 @@
 const example: string = "data/example-##.txt";
 const input: string = "data/input-##.txt";
 
+import fs from "fs";
+
 const solve_1 = (file: string): number => {
   console.log(file);
   return 0;
